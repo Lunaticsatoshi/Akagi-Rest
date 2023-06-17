@@ -1,0 +1,17 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type GoogleData {
+  iss: String!
+  sub: String!
+  hd: String!
+  email: String!
+  emailVerified: Boolean!
+  name: String!
+  picture: String!
+}
+
+type Query {
+  hello: String!
+}
