@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { setContext } from './common/middleware/setContext';
 import { LoggerService } from './common/logger/logger.service';
 import { parseToken } from './common/middleware/firebase-token-parser';
+import { VersioningType } from '@nestjs/common';
 
 function formatErroText(appName: string, err: any): string {
   let errorText = `[${appName}] Uncaught Exception: `;
@@ -29,6 +30,12 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({ logger: true }),
   );
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+    prefix: 'api/v',
+  });
   const config = app.get(ConfigService);
   const appName = config.get('appName');
 
