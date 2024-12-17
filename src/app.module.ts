@@ -1,10 +1,9 @@
-import { redisStore } from 'cache-manager-redis-yet';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
-import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
+import { RedisModule, RedisModuleOptions, RedisService } from '@liaoliaots/nestjs-redis';
 
 import { __prod__ } from './constants';
 import { LoggerModule } from './common/logger/logger.module';
@@ -42,28 +41,8 @@ import { UserModule } from './app/user/user.module';
       },
       inject: [ConfigService],
     }),
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      isGlobal: true,
-      useFactory: async (configService: ConfigService) => {
-        const redisConfig = configService.get('redis');
-        const store = await redisStore({
-          socket: {
-            host: redisConfig.host,
-            port: redisConfig.port,
-          },
-          database: redisConfig.db,
-        });
-        return {
-          store: store as unknown as CacheStore,
-          ttl: 8640000,
-        };
-      },
-      inject: [ConfigService],
-    }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
       useFactory: async (
         configService: ConfigService,
       ): Promise<RedisModuleOptions> => {
@@ -72,11 +51,28 @@ import { UserModule } from './app/user/user.module';
           config: {
             host: redisConfig.host,
             port: redisConfig.port,
-            db: redisConfig.db,
+            db: 1,
+            onClientCreated: (client) => {
+              client.on('error', (err) => {
+                console.error('Redis Client Error', err);
+              });
+            }
           },
           readyLog: true,
         };
       },
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async (redisService: RedisService) => {
+        const redis = await redisService.getOrThrow();
+        return {
+          store: redis as unknown as CacheStore,
+          ttl: 8640000,
+        };
+      },
+      inject: [RedisService],
     }),
     LoggerModule,
     PubSubModule,
