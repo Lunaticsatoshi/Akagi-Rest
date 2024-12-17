@@ -127,15 +127,15 @@ export class LoggerService extends Logger {
       });
 
       if (level === 'error' && process.env.NODE_ENV !== 'development') {
-        this.httpService
-          .post(this.slackNotificationUrls.errorsNotificationChannel, {
-            text: `Error occurred in Plato \n\n ${JSON.stringify(
-              processedData,
-              null,
-              4,
-            )}`,
-          })
-          .subscribe();
+        // this.httpService
+        //   .post(this.slackNotificationUrls.errorsNotificationChannel, {
+        //     text: `Error occurred in Akagi \n\n ${JSON.stringify(
+        //       processedData,
+        //       null,
+        //       4,
+        //     )}`,
+        //   })
+        //   .subscribe();
       }
     } catch (error) {
       // eslint-disable-next-line no-console
