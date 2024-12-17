@@ -1,6 +1,8 @@
+import { redisStore } from 'cache-manager-redis-yet';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { __prod__ } from './constants';
 import { LoggerModule } from './common/logger/logger.module';
 import { parser } from './common/middleware/firebase-token-parser';
@@ -34,6 +36,24 @@ import { ScheduleModule } from '@nestjs/schedule';
           synchronize: !__prod__,
           logging: !__prod__,
           autoLoadEntities: true,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      isGlobal: true,
+      useFactory: async (configService: ConfigService) => {
+        const redisConfig = configService.get('redis');
+        const store = await redisStore({
+          socket: {
+            host: redisConfig.host,
+            port: redisConfig.port,
+          },
+        });
+        return {
+          store: store as unknown as CacheStore,
+          ttl: 8640000,
         };
       },
       inject: [ConfigService],
