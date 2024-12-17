@@ -18,6 +18,7 @@ export const config: { [key: string]: any; redis: RedisOptions } = {
   redis: {
     host: 'localhost',
     port: 6379,
+    db: 0,
   },
   s3: {
     bucket: getEnvVariable('USER_ASSETS_BUCKET'),
