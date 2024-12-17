@@ -3,6 +3,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule';
+import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
+
 import { __prod__ } from './constants';
 import { LoggerModule } from './common/logger/logger.module';
 import { parser } from './common/middleware/firebase-token-parser';
@@ -10,7 +13,6 @@ import { PubSubModule } from './common/pubsub/pubsub.module';
 import { configuration } from './config';
 import { S3Module } from './app/s3/s3.module';
 import { UserModule } from './app/user/user.module';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -50,6 +52,7 @@ import { ScheduleModule } from '@nestjs/schedule';
             host: redisConfig.host,
             port: redisConfig.port,
           },
+          database: redisConfig.db,
         });
         return {
           store: store as unknown as CacheStore,
@@ -57,6 +60,23 @@ import { ScheduleModule } from '@nestjs/schedule';
         };
       },
       inject: [ConfigService],
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<RedisModuleOptions> => {
+        const redisConfig = configService.get('redis');
+        return {
+          config: {
+            host: redisConfig.host,
+            port: redisConfig.port,
+            db: redisConfig.db,
+          },
+          readyLog: true,
+        };
+      },
     }),
     LoggerModule,
     PubSubModule,
