@@ -1,17 +1,16 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import { ScheduleModule } from '@nestjs/schedule';
-import { RedisModule, RedisModuleOptions, RedisService } from '@liaoliaots/nestjs-redis';
+import { RedisModule, RedisModuleOptions, RedisService } from '@liaoliaots/nestjs-redis'
+import { CacheModule, CacheStore } from '@nestjs/cache-manager'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
+import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { __prod__ } from './constants';
-import { LoggerModule } from './common/logger/logger.module';
-import { parser } from './common/middleware/firebase-token-parser';
-import { PubSubModule } from './common/pubsub/pubsub.module';
-import { configuration } from './config';
-import { S3Module } from './app/s3/s3.module';
-import { UserModule } from './app/user/user.module';
+import { S3Module } from './app/s3/s3.module'
+import { UserModule } from './app/user/user.module'
+import { LoggerModule } from './common/logger/logger.module'
+import { PubSubModule } from './common/pubsub/pubsub.module'
+import { configuration } from './config'
+import { __prod__ } from './constants'
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { UserModule } from './app/user/user.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const postgresConfig = configService.get('postgres');
+        const postgresConfig = configService.get('postgres')
         return {
           type: 'postgres',
           host: postgresConfig.dbHost,
@@ -37,40 +36,38 @@ import { UserModule } from './app/user/user.module';
           synchronize: !__prod__,
           logging: !__prod__,
           autoLoadEntities: true,
-        };
+        }
       },
       inject: [ConfigService],
     }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService,
-      ): Promise<RedisModuleOptions> => {
-        const redisConfig = configService.get('redis');
+      useFactory: async (configService: ConfigService): Promise<RedisModuleOptions> => {
+        const redisConfig = configService.get('redis')
         return {
           config: {
             host: redisConfig.host,
             port: redisConfig.port,
             db: 1,
-            onClientCreated: (client) => {
-              client.on('error', (err) => {
-                console.error('Redis Client Error', err);
-              });
-            }
+            onClientCreated: client => {
+              client.on('error', err => {
+                console.error('Redis Client Error', err)
+              })
+            },
           },
           readyLog: true,
-        };
+        }
       },
       inject: [ConfigService],
     }),
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: async (redisService: RedisService) => {
-        const redis = await redisService.getOrThrow();
+        const redis = await redisService.getOrThrow()
         return {
           store: redis as unknown as CacheStore,
           ttl: 8640000,
-        };
+        }
       },
       inject: [RedisService],
     }),

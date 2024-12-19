@@ -1,54 +1,54 @@
 // base.entity.ts
+import { instanceToPlain } from 'class-transformer'
 import {
-  PrimaryGeneratedColumn,
+  BaseEntity as TypeormBaseEntity,
+  BeforeInsert,
   Column,
-  UpdateDateColumn,
   CreateDateColumn,
   Index,
-  BeforeInsert,
-  BaseEntity as TypeormBaseEntity,
-} from 'typeorm';
-import { instanceToPlain } from 'class-transformer';
-import { uuid } from 'uuidv4';
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { uuid } from 'uuidv4'
 
 export default abstract class BaseEntity extends TypeormBaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'uuid', unique: true })
   @Index()
-  uuid: string;
+  entityId: string
 
   @Column({ type: 'boolean', default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ type: 'boolean', default: false })
-  isArchived: boolean;
+  isArchived: boolean
 
   @Column({ type: 'varchar', length: 300, default: 'system' })
-  createdBy: string;
+  createdBy: string
 
   @Column({ type: 'varchar', length: 300, default: 'system' })
-  lastChangedBy: string;
+  lastChangedBy: string
 
   @Column({ type: 'varchar', length: 300, nullable: true })
-  internalComment: string | null;
+  internalComment: string | null
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
+  updatedAt: Date
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true })
-  deletedAt: Date;
+  deletedAt: Date
 
   @BeforeInsert()
   generateId() {
-    this.uuid = uuid();
+    this.entityId = uuid()
   }
 
   toJSON() {
-    return instanceToPlain(this);
+    return instanceToPlain(this)
   }
 }

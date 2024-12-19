@@ -11,29 +11,29 @@
  * Building setContext as a Global Middleware (https://docs.nestjs.com/middleware#global-middleware)
  * since we need it as soon as request hits the server
  */
-import { FastifyRequest, FastifyReply } from 'fastify';
-import _ = require('lodash');
-import shortid = require('shortid');
-import RequestContext from '../utils/request-context';
+import { FastifyReply, FastifyRequest } from 'fastify'
+import _ = require('lodash')
+import shortid = require('shortid')
+import RequestContext from '../utils/request-context'
 
 export function setContext(appName: string) {
   return (req: FastifyRequest, res: FastifyReply, next: () => void) => {
-    RequestContext.bind(req, res);
+    RequestContext.bind(req, res)
 
     _.each(req.headers, (value, key) => {
-      RequestContext.set(key, value);
-    });
+      RequestContext.set(key, value)
+    })
 
-    let correlationId = req.headers['x-correlation-id'];
-    const authToken = req.headers['Authorization'];
+    let correlationId = req.headers['x-correlation-id']
+    const authToken = req.headers['Authorization']
 
     if (!correlationId) {
-      correlationId = `${appName}-${shortid.generate()}`;
+      correlationId = `${appName}-${shortid.generate()}`
     }
 
-    RequestContext.set('correlationId', correlationId);
-    RequestContext.set('authToken', authToken);
+    RequestContext.set('correlationId', correlationId)
+    RequestContext.set('authToken', authToken)
 
-    next();
-  };
+    next()
+  }
 }

@@ -1,14 +1,16 @@
 import { NestFactory } from '@nestjs/core'
+
 import { AppModule } from './app.module'
 
 const { fastifyRequestContextPlugin } = require('@fastify/request-context')
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
+import { ValidationPipe, VersioningType } from '@nestjs/common'
 // import helmet = require('helmet');
 import { ConfigService } from '@nestjs/config'
-import { setContext } from './common/middleware/setContext'
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
+
 import { LoggerService } from './common/logger/logger.service'
 import { parseToken } from './common/middleware/firebase-token-parser'
-import { ValidationPipe, VersioningType } from '@nestjs/common'
+import { setContext } from './common/middleware/setContext'
 
 function formatErroText(appName: string, err: any): string {
   let errorText = `[${appName}] Uncaught Exception: `
