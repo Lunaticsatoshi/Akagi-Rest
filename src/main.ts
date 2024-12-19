@@ -52,7 +52,7 @@ async function bootstrap() {
     prefix: 'api/v',
   })
   await app.register(fastifyCookie, {
-    secret: 'my-secret', // for cookies signature
+    secret: config.get<string>('cookieSecret'), // for cookies signature
   })
 
   app.useGlobalPipes(
