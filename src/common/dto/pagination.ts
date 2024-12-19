@@ -1,7 +1,7 @@
 export class PaginationDto {
-  offset?: number;
+  offset?: number
 
-  limit: number;
+  limit: number
 
-  after?: string;
+  after?: string
 }

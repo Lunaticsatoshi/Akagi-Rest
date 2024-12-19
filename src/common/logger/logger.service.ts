@@ -1,15 +1,16 @@
-import _ = require('lodash');
-import { WinstonLogger } from './winston-logger.service';
-import { Injectable, Logger } from '@nestjs/common';
-import RequestContext from '../utils/request-context';
-import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
+import _ = require('lodash')
+import { HttpService } from '@nestjs/axios'
+import { Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+
+import RequestContext from '../utils/request-context'
+import { WinstonLogger } from './winston-logger.service'
 
 interface ISlackNotificationUrls {
-  topups: string;
-  directOrders: string;
-  offboardings: string;
-  errorsNotificationChannel: string;
+  topups: string
+  directOrders: string
+  offboardings: string
+  errorsNotificationChannel: string
 }
 
 /** @export
@@ -18,27 +19,25 @@ interface ISlackNotificationUrls {
  */
 @Injectable()
 export class LoggerService extends Logger {
-  slackNotificationUrls: ISlackNotificationUrls;
+  slackNotificationUrls: ISlackNotificationUrls
   constructor(
     private winstonLogger: WinstonLogger,
     private configService: ConfigService,
     private httpService: HttpService,
   ) {
-    super();
-    this.slackNotificationUrls = this.configService.get(
-      'slackInternalNotificationUrls',
-    );
+    super()
+    this.slackNotificationUrls = this.configService.get('slackInternalNotificationUrls')
   }
 
   private formatError = (error: any) => {
     if (!error) {
-      return {};
+      return {}
     }
 
     if (typeof error === 'string') {
       return {
         error,
-      };
+      }
     }
 
     return {
@@ -46,8 +45,8 @@ export class LoggerService extends Logger {
         message: error.message,
         stack: error.stack,
       },
-    };
-  };
+    }
+  }
   /**
    *
    *
@@ -65,49 +64,27 @@ export class LoggerService extends Logger {
    * @memberof CloudwatchLogger
    */
   private getData = (data: any): Array<any> => {
-    const [shortMessage, longMessage, extraInfo] = data;
-    const correlationId = RequestContext.get('correlationId');
-    const user: { uid: string } = RequestContext.get('user');
+    const [shortMessage, longMessage, extraInfo] = data
+    const correlationId = RequestContext.get('correlationId')
+    const user: { uid: string } = RequestContext.get('user')
     const info = {
       correlationId,
       uid: user?.uid,
-    };
+    }
     // if only data object if provided
     if (_.isPlainObject(shortMessage)) {
-      return [
-        '',
-        _.assign(
-          {},
-          { ...shortMessage, ...this.formatError(shortMessage.error) },
-          info,
-        ),
-      ];
+      return ['', _.assign({}, { ...shortMessage, ...this.formatError(shortMessage.error) }, info)]
     }
     // if a short message and data object is provided
     if (_.isPlainObject(longMessage)) {
-      return [
-        shortMessage,
-        _.assign(
-          {},
-          { ...longMessage, ...this.formatError(longMessage.error) },
-          info,
-        ),
-      ];
+      return [shortMessage, _.assign({}, { ...longMessage, ...this.formatError(longMessage.error) }, info)]
     }
     // if short, long message and data object provided
     if (_.isPlainObject(extraInfo)) {
-      return [
-        shortMessage,
-        longMessage,
-        _.assign(
-          {},
-          { ...extraInfo, ...this.formatError(extraInfo.error) },
-          info,
-        ),
-      ];
+      return [shortMessage, longMessage, _.assign({}, { ...extraInfo, ...this.formatError(extraInfo.error) }, info)]
     }
-    return [...data, info];
-  };
+    return [...data, info]
+  }
   /**
    *
    * Streams logs to graylog based on the isEnabled flag
@@ -118,13 +95,12 @@ export class LoggerService extends Logger {
    */
   private logHandler = (level: string, data: any[]) => {
     try {
-      const processedData: Array<any> = this.getData(data);
+      const processedData: Array<any> = this.getData(data)
       this.winstonLogger.logger[level](...processedData, (err: Error) => {
         if (err) {
-          // eslint-disable-next-line no-console
-          console.error(err);
+          console.error(err)
         }
-      });
+      })
 
       if (level === 'error' && process.env.NODE_ENV !== 'development') {
         // this.httpService
@@ -138,18 +114,17 @@ export class LoggerService extends Logger {
         //   .subscribe();
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   info(...message: any) {
-    this.logHandler('info', message);
+    this.logHandler('info', message)
   }
   error(...message: any) {
-    this.logHandler('error', message);
+    this.logHandler('error', message)
   }
   debug(...message: any) {
-    this.logHandler('debug', message);
+    this.logHandler('debug', message)
   }
 }
