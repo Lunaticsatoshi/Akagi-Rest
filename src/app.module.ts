@@ -48,7 +48,7 @@ import { __prod__ } from './constants'
           config: {
             host: redisConfig.host,
             port: redisConfig.port,
-            db: 1,
+            db: redisConfig.db,
             onClientCreated: client => {
               client.on('error', err => {
                 console.error('Redis Client Error', err)
