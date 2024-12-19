@@ -1,16 +1,15 @@
 import { NestFactory } from '@nestjs/core'
-
-import { AppModule } from './app.module'
-
 const { fastifyRequestContextPlugin } = require('@fastify/request-context')
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 // import helmet = require('helmet');
 import { ConfigService } from '@nestjs/config'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
+import { LoggerService } from 'src/common/logger/logger.service'
+import { parseToken } from 'src/common/middleware/firebase-token-parser'
+import { HttpExceptionFilter } from 'src/common/middleware/http-exception.filter'
+import { setContext } from 'src/common/middleware/setContext'
 
-import { LoggerService } from './common/logger/logger.service'
-import { parseToken } from './common/middleware/firebase-token-parser'
-import { setContext } from './common/middleware/setContext'
+import { AppModule } from './app.module'
 
 function formatErroText(appName: string, err: any): string {
   let errorText = `[${appName}] Uncaught Exception: `
@@ -40,6 +39,7 @@ async function bootstrap() {
       transform: true,
     }),
   )
+  app.useGlobalFilters(new HttpExceptionFilter())
   const config = app.get(ConfigService)
   const appName = config.get('appName')
 
