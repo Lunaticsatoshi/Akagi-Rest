@@ -4,12 +4,12 @@ import { ValidationPipe, VersioningType } from '@nestjs/common'
 // import helmet = require('helmet');
 import { ConfigService } from '@nestjs/config'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
-import { LoggerService } from 'src/common/logger/logger.service'
-import { parseToken } from 'src/common/middleware/firebase-token-parser'
-import { HttpExceptionFilter } from 'src/common/middleware/http-exception.filter'
-import { setContext } from 'src/common/middleware/setContext'
 
 import { AppModule } from './app.module'
+import { LoggerService } from './common/logger/logger.service'
+import { parseToken } from './common/middleware/firebase-token-parser'
+import { HttpExceptionFilter } from './common/middleware/http-exception.filter'
+import { setContext } from './common/middleware/setContext'
 
 function formatErroText(appName: string, err: any): string {
   let errorText = `[${appName}] Uncaught Exception: `
@@ -25,21 +25,6 @@ function formatErroText(appName: string, err: any): string {
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }))
-
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: 'api/v',
-  })
-  app.useGlobalPipes(
-    new ValidationPipe({
-      disableErrorMessages: true,
-      whitelist: true,
-      skipMissingProperties: true,
-      transform: true,
-    }),
-  )
-  app.useGlobalFilters(new HttpExceptionFilter())
   const config = app.get(ConfigService)
   const appName = config.get('appName')
 
@@ -60,8 +45,24 @@ async function bootstrap() {
   // app.use(httpContext.middleware);
   app.use(setContext(appName))
   app.use(parseToken)
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+    prefix: 'api/v',
+  })
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      disableErrorMessages: true,
+      whitelist: true,
+      skipMissingProperties: true,
+      transform: true,
+    }),
+  )
 
   const logger = app.get(LoggerService)
+  app.useGlobalFilters(new HttpExceptionFilter(logger))
+
   process.on('unhandledRejection', (err: any) => {
     const errorText: string = formatErroText(appName, err)
     logger.error(errorText)

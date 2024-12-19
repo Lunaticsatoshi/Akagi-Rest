@@ -1,9 +1,11 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { IErrorResponse } from 'src/common/interfaces/error'
+import { LoggerService } from 'src/common/logger/logger.service'
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
+  constructor(private readonly loggerService: LoggerService) {}
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<FastifyReply>()
@@ -19,6 +21,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
     }
+
+    this.loggerService.error(message, { exception })
 
     response.status(status).send(responseJSON)
   }
