@@ -1,13 +1,13 @@
-import { getEnvVariable } from 'src/common/utils/env';
-import { RedisOptions } from 'ioredis';
+import { RedisOptions } from 'ioredis'
+import { getEnvVariable } from 'src/common/utils/env'
 
-const postgresDbHost = getEnvVariable('DATABASE_HOST');
-const postgresDbPort = getEnvVariable('DATABASE_PORT');
-const postgresDbUsername = getEnvVariable('DATABASE_USERNAME');
-const postgresDbPassword = getEnvVariable('DATABASE_PASSWORD');
-const postgresDbName = getEnvVariable('DATABASE_NAME');
-const redisDbHost = getEnvVariable('REDIS_HOST');
-const redisDbPort = getEnvVariable('REDIS_PORT');
+const postgresDbHost = getEnvVariable('DATABASE_HOST')
+const postgresDbPort = getEnvVariable('DATABASE_PORT')
+const postgresDbUsername = getEnvVariable('DATABASE_USERNAME')
+const postgresDbPassword = getEnvVariable('DATABASE_PASSWORD')
+const postgresDbName = getEnvVariable('DATABASE_NAME')
+const redisDbHost = getEnvVariable('REDIS_HOST')
+const redisDbPort = getEnvVariable('REDIS_PORT')
 
 export const config: { [key: string]: any; redis: RedisOptions } = {
   postgres: {
@@ -28,4 +28,5 @@ export const config: { [key: string]: any; redis: RedisOptions } = {
       region: 'ap-south-1',
     },
   },
-};
+  cookieSecret: getEnvVariable('COOKIE_SECRET'),
+}

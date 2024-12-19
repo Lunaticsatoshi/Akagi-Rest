@@ -1,11 +1,11 @@
-import { getEnvVariable } from 'src/common/utils/env';
-import { RedisOptions } from 'ioredis';
+import { RedisOptions } from 'ioredis'
+import { getEnvVariable } from 'src/common/utils/env'
 
-const postgresDbHost = getEnvVariable('DATABASE_HOST');
-const postgresDbPort = getEnvVariable('DATABASE_PORT');
-const postgresDbUsername = getEnvVariable('DATABASE_USERNAME');
-const postgresDbPassword = getEnvVariable('DATABASE_PASSWORD');
-const postgresDbName = getEnvVariable('DATABASE_NAME');
+const postgresDbHost = getEnvVariable('DATABASE_HOST')
+const postgresDbPort = getEnvVariable('DATABASE_PORT')
+const postgresDbUsername = getEnvVariable('DATABASE_USERNAME')
+const postgresDbPassword = getEnvVariable('DATABASE_PASSWORD')
+const postgresDbName = getEnvVariable('DATABASE_NAME')
 
 export const config: { [key: string]: any; redis: RedisOptions } = {
   postgres: {
@@ -31,4 +31,5 @@ export const config: { [key: string]: any; redis: RedisOptions } = {
     },
   },
   hostDomain: 'kaguya-dev.vercel.app',
-};
+  cookieSecret: getEnvVariable('COOKIE_SECRET'),
+}

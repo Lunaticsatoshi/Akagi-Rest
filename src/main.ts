@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 const { fastifyRequestContextPlugin } = require('@fastify/request-context')
+import fastifyCookie from '@fastify/cookie'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 // import helmet = require('helmet');
 import { ConfigService } from '@nestjs/config'
@@ -49,6 +50,9 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
     prefix: 'api/v',
+  })
+  await app.register(fastifyCookie, {
+    secret: 'my-secret', // for cookies signature
   })
 
   app.useGlobalPipes(
