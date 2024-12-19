@@ -17,7 +17,7 @@ const eslintConfig = [
     //   project: 'tsconfig.json',
     //   sourceType: 'module',
     // },
-    plugins: ['@typescript-eslint/eslint-plugin'],
+    plugins: ['@typescript-eslint/eslint-plugin', 'unused-imports', 'simple-import-sort'],
     extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
     ignorePatterns: ['eslint.config.mjs', 'node_modules/', 'build/', 'dist/', 'coverage', 'tsconfig.json'],
     rules: {
@@ -26,7 +26,11 @@ const eslintConfig = [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-require-imports': 'off'
+      '@typescript-eslint/no-require-imports': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error"
     },
   }),
 ]
