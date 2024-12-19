@@ -20,6 +20,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
     }
 
-    response.send(responseJSON)
+    response.status(status).send(responseJSON)
   }
 }
