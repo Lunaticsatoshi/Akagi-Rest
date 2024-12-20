@@ -24,15 +24,14 @@ export function setContext(appName: string) {
       RequestContext.set(key, value)
     })
 
-    let correlationId = req.headers['x-correlation-id']
-    const authToken = req.headers['Authorization']
+    let correlationId = req.cookies?.['x-correlation-id'] || req.headers['x-correlation-id']
 
     if (!correlationId) {
       correlationId = `${appName}-${shortid.generate()}`
     }
 
+    RequestContext.set('appName', appName)
     RequestContext.set('correlationId', correlationId)
-    RequestContext.set('authToken', authToken)
 
     next()
   }
