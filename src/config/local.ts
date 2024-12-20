@@ -30,6 +30,7 @@ export const config: { [key: string]: any; redis: RedisOptions } = {
       },
     },
   },
-  hostDomain: 'kaguya-dev.vercel.app',
   cookieSecret: getEnvVariable('COOKIE_SECRET'),
+  hostDomain: 'oshi-dev.vercel.app',
+  sessionDomain: 'localhost',
 }

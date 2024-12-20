@@ -29,4 +29,6 @@ export const config: { [key: string]: any; redis: RedisOptions } = {
     },
   },
   cookieSecret: getEnvVariable('COOKIE_SECRET'),
+  hostDomain: 'oshi-dev.vercel.app',
+  sessionDomain: '.ophis.app',
 }

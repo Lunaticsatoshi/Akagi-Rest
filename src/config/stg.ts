@@ -26,5 +26,6 @@ export const config = {
       region: 'ap-south-1',
     },
   },
-  hostDomain: 'raven-dev.vercel.app',
+  hostDomain: 'oshi-stg.vercel.app',
+  sessionDomain: '.ophis.app',
 }

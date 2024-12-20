@@ -1,4 +1,4 @@
-import { getEnvVariable } from 'src/common/utils/env';
+import { getEnvVariable } from 'src/common/utils/env'
 
 export const config = {
   appName: 'akagi',
@@ -7,4 +7,4 @@ export const config = {
     region: getEnvVariable('AWS_REGION'),
   },
   airtableConfig: {},
-};
+}

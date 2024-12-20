@@ -26,4 +26,6 @@ export const config = {
       region: 'ap-south-1',
     },
   },
+  hostDomain: 'ophis.app',
+  sessionDomain: '.ophis.app',
 }
