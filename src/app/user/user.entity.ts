@@ -1,27 +1,78 @@
-import { Entity, Column, Index } from 'typeorm';
-import { IsEmail, Length } from 'class-validator';
+import { IsEmail, IsNumber, IsPhoneNumber, IsString, Length } from 'class-validator'
+import { Column, Entity, Index, UpdateDateColumn } from 'typeorm'
 
-import BaseEntity from '../../entities/base.entity';
+import BaseEntity from '../../entities/base.entity'
 
 export enum AUTH_TYPE {
-  EMAIL_AND_PASSWORD = 'EMAIL_AND_PASSWORD',
+  EMAIL = 'EMAIL',
   GOOGLE = 'GOOGLE',
 }
 
+export enum USER_TYPE {
+  AGENCY_USER = 'AGENCY',
+  CLIENT_USER = 'CLIENT',
+}
+
 export class GoogleData {
-  iss: string;
+  iss: string
 
-  sub: string;
+  sub: string
 
-  hd: string;
+  hd: string
 
-  email: string;
+  email: string
 
-  emailVerified: boolean;
+  emailVerified: boolean
 
-  name: string;
+  name: string
 
-  picture: string;
+  picture: string
+}
+
+export class SourceDetails {
+  @IsString()
+  ipAddress: string
+
+  @IsString()
+  userAgent: string
+
+  @IsString()
+  initialReferrer: string
+
+  @IsString()
+  referrer: string
+
+  @IsString()
+  utmSource: string
+
+  @IsString()
+  utmMedium: string
+
+  @IsString()
+  utmCampaign: string
+
+  @IsString()
+  utmContent: string
+}
+
+export class Address {
+  @IsString()
+  address1?: string
+
+  @IsString()
+  address2?: string
+
+  @IsString()
+  city?: string
+
+  @IsString()
+  state?: string
+
+  @IsString()
+  country?: string
+
+  @IsNumber()
+  pincode?: string
 }
 
 @Entity('users')
@@ -30,34 +81,72 @@ export class UserEntity extends BaseEntity {
   @IsEmail(undefined, { message: 'Must be a valid email address' })
   @Length(1, 255, { message: 'Email is empty' })
   @Column({ unique: true })
-  email: string;
+  email: string
+
+  @IsString()
+  @Column({ nullable: true })
+  firstName?: string
+
+  @IsString()
+  @Column({ nullable: true })
+  lastName?: string
 
   @Index()
   @Length(3, 255, { message: 'Must be at least 3 characters long' })
   @Column({ unique: true })
-  username: string;
+  username: string
 
   @Column({ nullable: true })
-  password?: string;
+  countryCode?: string
+
+  @IsPhoneNumber(undefined, { message: 'Must be a valid phone number' })
+  @Column({ unique: true, nullable: true })
+  phoneNumber?: string
+
+  @Column({ nullable: true })
+  password?: string
 
   @Column({
     type: 'enum',
-    default: AUTH_TYPE.EMAIL_AND_PASSWORD,
+    default: AUTH_TYPE.EMAIL,
     enum: AUTH_TYPE,
   })
-  authType: AUTH_TYPE;
+  authType: AUTH_TYPE
+
+  @Column({
+    type: 'enum',
+    default: USER_TYPE.CLIENT_USER,
+    enum: USER_TYPE,
+  })
+  userType: USER_TYPE
 
   @Column({ nullable: true })
-  profileImageUrn?: string;
+  avatarUrn?: string
 
-  profileImageUrl: string;
-
-  @Column({ default: false, type: 'boolean' })
-  status: boolean;
+  @Column({ nullable: true })
+  avatarUrl?: string
 
   @Column({ default: false, type: 'boolean' })
-  emailVerified: boolean;
+  emailVerified: boolean
+
+  @Column({ default: false, type: 'boolean' })
+  phoneVerified: boolean
+
+  @Column({ default: false, type: 'boolean' })
+  onboarded: boolean
+
+  @Column({ default: false, type: 'boolean' })
+  isInvited: boolean
 
   @Column({ type: 'jsonb', nullable: true })
-  googleData: GoogleData;
+  sourceDetails?: SourceDetails
+
+  @Column({ type: 'jsonb', nullable: true })
+  googleData?: GoogleData
+
+  @Column({ type: 'jsonb', nullable: true })
+  address?: Address
+
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
+  lastSignIn: Date
 }
