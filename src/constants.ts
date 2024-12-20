@@ -15,3 +15,5 @@ export const USER_LOGIN_OTP_CHECK_COUNT_STORE = `${REDIS_NAMESPACE}_login_otp_ch
 
 export const USER_TOKEN_STORE = `${REDIS_NAMESPACE}_user_token_store`
 export const USER_TOKEN_ID_MAP = `${REDIS_NAMESPACE}_user_token_id_map`
+
+export const IS_PUBLIC_KEY = 'isPublic'
