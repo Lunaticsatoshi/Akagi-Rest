@@ -43,6 +43,7 @@ export class AuthGuard implements CanActivate {
 
     const user = await this.redis.get(`${USER_TOKEN_STORE}_${token}`)
     RequestContext.set('user', user)
+    RequestContext.set('authToken', token)
     // const gqlContext = context.getArgByIndex(2)
     // const user = RequestContext.get('user') || gqlContext?.extra?.user
     return Boolean(user)

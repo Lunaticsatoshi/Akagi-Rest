@@ -2,11 +2,13 @@ import { RedisModule, RedisModuleOptions, RedisService } from '@liaoliaots/nestj
 import { CacheModule, CacheStore } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { S3Module } from './app/s3/s3.module'
 import { UserModule } from './app/user/user.module'
+import { AuthGuard } from './common/guards/auth.guard'
 import { LoggerModule } from './common/logger/logger.module'
 import { PubSubModule } from './common/pubsub/pubsub.module'
 import { configuration } from './config'
@@ -75,6 +77,12 @@ import { __prod__ } from './constants'
     PubSubModule,
     S3Module,
     UserModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}
