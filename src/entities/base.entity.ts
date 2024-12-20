@@ -40,7 +40,7 @@ export default abstract class BaseEntity extends TypeormBaseEntity {
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date
 
-  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   deletedAt: Date
 
   @BeforeInsert()
