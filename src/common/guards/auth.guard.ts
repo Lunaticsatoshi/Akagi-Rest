@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(req: FastifyRequest): string | undefined {
-    const authToken = (req.cookies['user_auth_token'] || req.headers['user_auth_token']) as string
+    const authToken = (req.cookies['session_token'] || req.headers['session_token']) as string
     const mimicId = (req.cookies['x-mimic-user-id'] || req.headers['x-mimic-user-id']) as string
 
     return authToken || mimicId || undefined
@@ -30,7 +30,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ])
     if (isPublic) {
-      // 💡 See this condition
       return true
     }
     const ctx = context.switchToHttp()
@@ -41,12 +40,13 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Unauthorized user')
     }
 
-    const user = await this.redis.get(`${USER_TOKEN_STORE}_${token}`)
-    RequestContext.set('user', user)
-    RequestContext.set('authToken', token)
-    // const gqlContext = context.getArgByIndex(2)
-    // const user = RequestContext.get('user') || gqlContext?.extra?.user
-    return Boolean(user)
+    const user = await this.redis.hgetall(`${USER_TOKEN_STORE}_${token}`)
+    const canAccess = Object.keys(user).length > 0
+    if (canAccess) {
+      RequestContext.set('user', user)
+      RequestContext.set('authToken', token)
+    }
+    return canAccess
   }
 }
 
