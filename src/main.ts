@@ -2,13 +2,12 @@ import { NestFactory } from '@nestjs/core'
 const { fastifyRequestContextPlugin } = require('@fastify/request-context')
 import fastifyCookie from '@fastify/cookie'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
-// import helmet = require('helmet');
 import { ConfigService } from '@nestjs/config'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
+import helmet from 'helmet'
 
 import { AppModule } from './app.module'
 import { LoggerService } from './common/logger/logger.service'
-import { parseToken } from './common/middleware/firebase-token-parser'
 import { HttpExceptionFilter } from './common/middleware/http-exception.filter'
 import { setContext } from './common/middleware/setContext'
 
@@ -32,27 +31,25 @@ async function bootstrap() {
   console.log(process.env.ENV_FILE)
 
   app.register(fastifyRequestContextPlugin)
+  await app.register(fastifyCookie, {
+    secret: config.get<string>('cookieSecret'), // for cookies signature
+  })
 
   app.enableCors({
     allowedHeaders:
-      'X-Requested-With, Content-Type, Origin, Authorization, Accept, x-auth-token, x-portal-token, Accept-Encoding, X-niyoappApp-error, X-niyoappApp-params, X-niyoappApp-exceptionCode, X-Total-Count, Link, X-niyoappApp-alert, OtpRefId, x-client-id, x-session-id, x-correlation-id, x-timezone-id, x-device-id, x-login-pin, x-accessible-corporates,x-selected-corporate,x-force-regenerate,x-include-cash,x-include-claim, x-stats-only, x-include-none',
+      'X-Requested-With, Content-Type, Origin, Authorization, Accept, x-auth-token, x-portal-token, Accept-Encoding, X-Total-Count, Link, OtpRefId, x-client-id, x-session-id, x-correlation-id, x-timezone-id, x-device-id, x-login-pin, x-accessible-corporates,x-selected-corporate,x-force-regenerate,x-include-cash,x-include-claim, x-stats-only, x-include-none',
     exposedHeaders:
-      'X-Requested-With, Content-Type, Origin, Authorization, Accept, x-auth-token, x-portal-token, Accept-Encoding, X-niyoappApp-error, X-niyoappApp-params, X-niyoappApp-exceptionCode, X-Total-Count, Link, X-niyoappApp-alert, X-last-record-date,x-accessible-corporates,x-selected-corporate,x-force-regenerate,x-include-cash,x-include-claim, x-stats-only,  x-include-none',
+      'X-Requested-With, Content-Type, Origin, Authorization, Accept, x-auth-token, x-portal-token, Accept-Encoding, X-Total-Count, Link, X-last-record-date,x-accessible-corporates,x-selected-corporate,x-force-regenerate,x-include-cash,x-include-claim, x-stats-only,  x-include-none',
     methods: 'POST, PUT, GET, DELETE, PATCH, HEAD',
+    credentials: true,
   })
-  // app.use(
-  //   helmet({ contentSecurityPolicy: process.env.NODE_ENV !== 'development' }),
-  // );
+  app.use(helmet({ contentSecurityPolicy: process.env.NODE_ENV !== 'development' }))
   // app.use(httpContext.middleware);
   app.use(setContext(appName))
-  app.use(parseToken)
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
     prefix: 'api/v',
-  })
-  await app.register(fastifyCookie, {
-    secret: config.get<string>('cookieSecret'), // for cookies signature
   })
 
   app.useGlobalPipes(
