@@ -50,7 +50,7 @@ export class AuthController {
 
       response.setCookie('session_token', token, {
         httpOnly: true,
-        // domain: this.configService.get('sessionDomain'),
+        domain: this.configService.get('sessionDomain'),
         secure: __prod__,
         path: '/',
         sameSite: __prod__ ? 'lax' : 'none',
